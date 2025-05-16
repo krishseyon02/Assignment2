@@ -1,22 +1,37 @@
 #!/bin/bash
 
-# Check input arguments
-if [ $# -ne 2 ]; then
+# Check for correct number of arguments
+if [ "$#" -ne 2 ]; then
   echo "Usage: $0 <filename> <delimiter>"
   exit 1
 fi
 
-file="$1"
+filename="$1"
 delimiter="$2"
 
-# Read the first line (header)
-header=$(head -n 1 "$file")
-IFS="$delimiter" read -ra columns <<< "$header"
-num_cols=${#columns[@]}
-
-# Loop through each column index
-for ((i=1; i<=num_cols; i++)); do
-  col_name="${columns[$((i-1))]}"
-  count=$(awk -F"$delimiter" -v col=$i 'NR>1 {if ($col == "" || $col ~ /^[[:space:]]*$/) c++} END {print c+0}' "$file")
-  echo "$col_name: $count"
-done
+# Run awk to count empty cells
+awk -F"$delimiter" '
+NR==1 {
+  # Clean and store column names
+  for (i=1; i<=NF; i++) {
+    gsub(/^\/?/, "", $i)         # Remove leading slash (e.g., "/ID" → "ID")
+    gsub(/[^[:print:]]/, "", $i) # Remove non-printable characters
+    colnames[i] = $i
+    empty[i] = 0
+  }
+  next
+}
+{
+  for (i=1; i<=NF; i++) {
+    gsub(/^ +| +$/, "", $i)  # Trim whitespace
+    if ($i == "") {
+      empty[i]++
+    }
+  }
+}
+END {
+  for (i=1; i<=length(colnames); i++) {
+    print colnames[i] ": " empty[i]
+  }
+}
+' "$filename"
