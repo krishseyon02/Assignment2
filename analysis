@@ -43,8 +43,8 @@ awk -F"\t" '
 
 # Step 4: Correlation between Complexity and Average Rating
 awk -F"\t" '
-  NR>1 && $10 != "" && $9 != "" {
-    x = $10; y = $9;
+  NR>1 && $11 != "" && $9 != "" {
+    x = $11; y = $9;
     sum_x += x; sum_y += y;
     sum_xy += x * y;
     sum_x2 += x * x;
