@@ -1,29 +1,37 @@
 #!/bin/bash
 
-# Check for correct number of arguments
+# ----------------------------------------------
+# Author: Seyon Krishnathasan
+# Student ID: 24586524
+# Date: 19 May 2025
+# Script Name: empty_cells
+# ---------------------------------------------- 
+
+# Check for exact 2 arguments 
 if [ "$#" -ne 2 ]; then
   echo "Usage: $0 <filename> <delimiter>"
   exit 1
 fi
 
-filename="$1"
-delimiter="$2"
+# Assign input arguments 
+filename="$1" # input file
+delimiter="$2" # field delimeter
 
-# Run awk to count empty cells
+# Use  awk to count empty cells
 awk -F"$delimiter" '
 NR==1 {
-  # Clean and store column names
+  # process teh header line in the file
   for (i=1; i<=NF; i++) {
-    gsub(/^\/?/, "", $i)         # Remove leading slash (e.g., "/ID" → "ID")
+    gsub(/^\/?/, "", $i)         # Remove any character "/" from the column name
     gsub(/[^[:print:]]/, "", $i) # Remove non-printable characters
-    colnames[i] = $i
+    colnames[i] = $i  # store cleaned columns
     empty[i] = 0
   }
-  next
+  next # skip the next line
 }
 {
   for (i=1; i<=NF; i++) {
-    gsub(/^ +| +$/, "", $i)  # Trim whitespace
+    gsub(/^ +| +$/, "", $i)  # Trim whitespace from each fields
     if ($i == "") {
       empty[i]++
     }
@@ -31,7 +39,7 @@ NR==1 {
 }
 END {
   for (i=1; i<=length(colnames); i++) {
-    print colnames[i] ": " empty[i]
+    print colnames[i] ": " empty[i] # print column names 
   }
 }
-' "$filename"
+' "$filename" # Input file passed to awk 
