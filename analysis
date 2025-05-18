@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# ----------------------------------------------
+# Author: Seyon Krishnathasan
+# Student ID: 24586524
+# Script Name: analysis
+# ---------------------------------------------- 
+
+# Check for one argument
 if [ "$#" -ne 1 ]; then
   echo "Usage: $0 <cleaned_file.tsv>"
   exit 1
@@ -7,7 +14,7 @@ fi
 
 file="$1"
 
-# Step 1: Most popular mechanic
+# Find most popular game mechanic from cleaned file by splits mechanics in to spearate lines remvove blank lines
 echo "The most popular game mechanics is $( \
   cut -f13 "$file" | tail -n +2 | \
   tr ',.' '\n' | sed 's/^ *//' | sed '/^$/d' | \
@@ -15,7 +22,7 @@ echo "The most popular game mechanics is $( \
   awk '{print substr($0, index($0,$2)) " found in " $1 " games"}' \
 )"
 
-# Step 2: Most popular domain
+# Find most popular game domain
 echo "The most game domain is $( \
   cut -f14 "$file" | tail -n +2 | \
   tr ',.' '\n' | sed 's/^ *//' | sed '/^$/d' | \
@@ -23,9 +30,9 @@ echo "The most game domain is $( \
   awk '{print substr($0, index($0,$2)) " found in " $1 " games"}' \
 )"
 
-# Step 3: Correlation between Year Published and Average Rating
+# find correation between year published and rating 
 awk -F"\t" '
-  NR>1 && $3 != "" && $9 != "" {
+  NR>1 && $3 != "" && $9 != "" {  # skip header row 
     x = $3; y = $9;
     sum_x += x; sum_y += y;
     sum_xy += x * y;
@@ -33,15 +40,15 @@ awk -F"\t" '
     sum_y2 += y * y;
     n++
   }
-  END {
-    numerator = n * sum_xy - sum_x * sum_y
-    denominator = sqrt((n * sum_x2 - (sum_x)^2) * (n * sum_y2 - (sum_y)^2))
-    r = numerator / denominator
+  END { # calculate the pearson coefficient 
+    X = n * sum_xy - sum_x * sum_y
+    Y = sqrt((n * sum_x2 - (sum_x)^2) * (n * sum_y2 - (sum_y)^2))
+    r = X / Y
     printf "The correlation between the year of publication and the average rating is %.3f\n", r
   }
 ' "$file"
 
-# Step 4: Correlation between Complexity and Average Rating
+# Find correlation between complexity and rating 
 awk -F"\t" '
   NR>1 && $11 != "" && $9 != "" {
     x = $11; y = $9;
@@ -50,11 +57,11 @@ awk -F"\t" '
     sum_x2 += x * x;
     sum_y2 += y * y;
     n++
-  }
-  END {
-    numerator = n * sum_xy - sum_x * sum_y
-    denominator = sqrt((n * sum_x2 - (sum_x)^2) * (n * sum_y2 - (sum_y)^2))
-    r = numerator / denominator
+  } 
+  END { # calculate correlation 
+    X = n * sum_xy - sum_x * sum_y
+    Y = sqrt((n * sum_x2 - (sum_x)^2) * (n * sum_y2 - (sum_y)^2))
+    r = X / Y
     printf "The correlation between the complexity of a game and its average rating is %.3f\n", r
   }
 ' "$file"
