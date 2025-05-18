@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# ----------------------------------------------
+# Author: Seyon Krishnathasan
+# Student ID: 24586524
+# Script Name: preprocess
+# ---------------------------------------------- 
+
+# Argument check whetehr one arguemt is passed
 if [ "$#" -ne 1 ]; then
   echo "Usage: $0 <filename>"
   exit 1
@@ -7,10 +14,10 @@ fi
 
 filename="$1"
 
-# Step 1: Find max existing ID
+# Find largest existing ID in the first column
 max_id=$(awk -F";" 'NR > 1 && $1 ~ /^[0-9]+$/ && $1 > max { max = $1 } END { print max }' "$filename")
 
-# Step 2: Process the file
+# Process the file
 awk -v max_id="$max_id" -F";" '
 BEGIN {
   OFS = "\t"
@@ -18,20 +25,20 @@ BEGIN {
 }
 NR == 1 {
   for (i = 1; i <= NF; i++) {
-    gsub(/\r/, "", $i)                 # Remove carriage returns in header
-    gsub(/[^[:print:]]/, "", $i)       # Remove non-printable characters
+    gsub(/\r/, "", $i)     # Clean each header fields
+    gsub(/[^[:print:]]/, "", $i)     # Remove non printable characters
   }
-  print                                  # Print cleaned header
+  print    # Print cleaned header
   next
 }
 {
   for (i = 1; i <= NF; i++) {
-    gsub(/\r/, "", $i)                 # Remove Windows carriage return
-    gsub(/[^[:print:]]/, "", $i)       # Remove non-ASCII characters
-    gsub(",", ".", $i)                 # Convert commas to periods in decimals
+    gsub(/\r/, "", $i)   # clean every fileds
+    gsub(/[^[:print:]]/, "", $i)   # Remove non printable characters
+    gsub(",", ".", $i)   # Convert commas to  decimals
   }
 
-  # Assign a new unique ID if ID is empty
+  # fix missing ID
   if ($1 == "") {
     $1 = id_counter
     id_counter++
