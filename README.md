@@ -41,12 +41,12 @@ The three main scripts:
 
 **Usage:**
 ```bash
-./preprocess <filename> > cleaned_bgg.tsv
+./preprocess <filename> > cleaned_bgg_dataset.tsv
 ```
 
 **Eg:**
 ```bash
-./preprocess bgg_dataset.txt > cleaned_bgg.tsv
+./preprocess bgg_dataset.txt > cleaned_bgg_dataset.tsv
 ```
 
 ---
