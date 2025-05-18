@@ -16,40 +16,41 @@ fi
 filename="$1" # input file
 delimiter="$2" # field delimeter
 
-# Get expected number of columns from header
+# Get the number of columns from header
 num_cols=$(head -n 1 "$filename" | awk -F"$delimiter" '{print NF}')
 
-# Use Awk to  Pad rows and count empty cells
+# Use Awk to  count empty cells
 awk -v FS="$delimiter" -v OFS="$delimiter" -v cols="$num_cols" '
 {
-  # Trim Windows carriage return
+  # remove return characters
   gsub(/\r/, "")
 
-  # Pad if fields are missing
+  # add empty column if rows has fewer columns
   while (NF < cols) {
-    $0 = $0 OFS
+    $0 = $0 OFS # add one more delimeter 
     NF++
   }
 
   # Store header
   if (NR == 1) {
     for (i = 1; i <= NF; i++) {
-      gsub(/^\/?/, "", $i)
-      colnames[i] = $i
-      empty[i] = 0
+      gsub(/^\/?/, "", $i)  # remove slash
+      colnames[i] = $i  # saved the clean column name
+      empty[i] = 0 # initialize empty counter 
     }
-    next
+    next # skip to the next line 
   }
 
   # Count empty cells
   for (i = 1; i <= cols; i++) {
-    gsub(/^ +| +$/, "", $i)
-    if ($i == "") {
+    gsub(/^ +| +$/, "", $i) # Trim spaces 
+    if ($i == "") { # increment the empty counter for the column if the filed is empty
       empty[i]++
     }
   }
 }
 END {
+# print results of column after all rows processed
   for (i = 1; i <= cols; i++) {
     print colnames[i] ": " empty[i]
   }
