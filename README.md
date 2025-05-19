@@ -2,7 +2,7 @@
 
 ## Overview
 
-This assignment will involve creating three Shell scripts for the Board games dataset, which will use Unix tools covered in this unit and/or calls to other Shell scripts
+This assignment will involve creating three Shell scripts for the Board games dataset, which will use Unix tools covered and/or calls to other Shell scripts
 
 The three main scripts:
 - `empty_cells`: Find out the number of empty cells per column in the raw data
